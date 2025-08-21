@@ -43,7 +43,7 @@ const activateHandler = (event: ExtendableEvent) => {
                 })
             );
         })
-            // ? 즉시제어는 확인해봐야함 페이지가 로드된 후 서비스 워커 변경 시 예상치못한 동작 발생 위험 있음, 네트워크 요청 메서드 변경시 문제가 될 수 있음
+            // ? 즉시제어는 확인 해봐야함 페이지가 로드된 후 서비스 워커 변경 시 예상치못한 동작 발생 위험 있음, 네트워크 요청 메서드 변경시 문제가 될 수 있음
             .then(() => {
                 console.log("서비스워커 활성화 완료");
                 return self.clients.claim();
@@ -51,17 +51,12 @@ const activateHandler = (event: ExtendableEvent) => {
     );
 
 };
-
+//TODO: 푸쉬 이벤트 핸들러 구현 후 알림 이벤트랑 동기화 작업 필요
 // 푸쉬 이벤트 핸들러
-
 const pushHandler = (event: PushEvent) => {
     console.log("푸쉬 메시지 수신", event)
     const options: NotificationOptions = {
         body: event.data ? event.data.text() : "새로운 알림이 있습니다.",
-        icon: "/favicon.ico",
-        badge: "/favicon.ico",
-        vibrate: [200, 100, 200],
-        requireInteraction: true,
         actions: [
             {action: "open", title: "보기"},
             {action: "close", title: "닫기"}
@@ -72,13 +67,14 @@ const pushHandler = (event: PushEvent) => {
     )
 }
 
+//TODO: 알림 이벤트 구현
 // 알림 클릭 이벤트 핸들러
 const notificationClickHandler = (event: NotificationEvent) => {
     console.log('알림 클릭됨:', event);
 
     event.notification.close();
 
-    if (event.action === 'explore') {
+    if (event.action === 'open') {
 
         event.waitUntil(
             self.clients.openWindow('/')
